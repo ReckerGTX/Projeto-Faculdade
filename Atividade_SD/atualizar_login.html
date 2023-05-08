@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <style>
+	 a[href="login.html"] {
+		 color: red;
+	 }
+ 	</style>
+  <!-- BOOTSTRAPT COMEÇO-->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Start your development with Dorang landing page.">
+  <meta name="author" content="Devcrud">
+  <title>API Task</title>
+  <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="assets/css/dorang.css">
+  <!-- BOOTSTRAPT FIM-->
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home" class="dark-theme">
+
+  <header class="header">
+    <div class="overlay"></div>
+    <div class="header-content">
+      <!-- COMEÇO TITULO E FORMULARIO DE UPDATE -->
+      <h1 class="header-title">Atualização de Usuários</h1><br>
+      <form id="atualizar_form" onsubmit="enviarAtualizacao(); return false;">
+        <label for="username">Usuário:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <label for="name">Novo nome:</label>
+        <input type="text" id="name" name="name"><br><br>
+        <label for="email">Novo e-mail:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="token">Token do usuário:</label>
+        <input type="text" id="token" name="token"><br><br>
+        <button type="submit">Atualizar</button><br><br>
+        <h2><a href="login.html">Retornar</h2>
+      </form>
+      <br>
+      <br>
+      <!-- RETORNA OS DADOS DO SCRIPT -->
+      <div id="resultado"></div>
+    </div>
+    <!-- FIM TITULO E FORMULARIO DE ATUALIZAÇÃO -->
+  </header>
+
+  <script>
+    const form = document.getElementById("atualizar_form");
+    form.addEventListener("submit", function (event) {
+      event.preventDefault(); // Impede o envio do formulário caso esteja em branco
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const token = document.getElementById("token").value;
+
+      // Faz a chamada à API de atualização de usuário
+      fetch("https://todolist-api.edsonmelo.com.br/api/user/update/", {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": token
+        },
+        body: JSON.stringify({
+          "name": name,
+          "email": email,
+          "username": username,
+          "password": password,
+          "token":token
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Não foi possível atualizar o usuário");
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.message === "User Successfully Updated") {
+            // Exibe a mensagem de sucesso na página
+            const resultado = `Usuário atualizado com sucesso!`;
+            document.getElementById("resultado").innerHTML = resultado;
+          } else if (data.message === "Invalid Arguments Number (Expected Five)") {
+            // Exibe uma mensagem de erro caso os argumentos estejam inválidos
+            document.getElementById("resultado").innerHTML = "Não foi possível atualizar o usuário. Verifique as informações e tente novamente.";
+          } else if (data.message === "Incorrect username and/or password") {
+            // Exibe uma mensagem de erro caso o username ou a senha esteja errados
+            document.getElementById("resultado").innerHTML = "Não foi possivel atualizar o usuário. Username ou senha incorretos!";
+          } else if (data.message === "Could Not Update User") {
+            // Exibe uma mensagem de erro caso o usuário não for atualizado
+            document.getElementById("resultado").innerHTML = "Não foi possível atualizar o usuário";
+          }
+        })
+        .catch(error => {
+          // Exibe uma mensagem de erro caso a chamada à API falhe
+          document.getElementById("resultado").innerHTML = error.message;
+        });
+    });
+  </script>
+
+</body>
+
+</html>

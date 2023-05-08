@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <style>
+	 a[href="login.html"] {
+		 color: red;
+	 }
+ 	</style>
+		<!-- BOOTSTRAPT COMEÇO-->
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Start your development with Dorang landing page.">
+    <meta name="author" content="Devcrud">
+    <title>API Task</title>
+    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+		<link rel="stylesheet" href="assets/css/dorang.css">
+		<!-- BOOTSTRAPT FIM-->
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home" class="dark-theme">
+
+    <header class="header">
+        <div class="overlay"></div>
+        <div class="header-content">
+					<!-- COMEÇO TITULO E FORMULARIO DE LOGIN -->
+          <h1 class="header-title">Coloque seu usuário e senha para gerar seu Token</h1><br><br>
+          <form id="login-form">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password"><br><br>
+            <button type="submit">Entrar</button><br><br>
+           <h2><a href="login.html">Retornar</h2>
+          </form>
+          <br>
+          <br>
+						<!-- RETORNA OS DADOS DO SCRIPT -->
+          <div id="resultado"></div>
+        </div>
+					<!-- FIM TITULO E FORMULARIO DE LOGIN -->
+    </header>
+
+    <script>
+      const form = document.getElementById("login-form");
+      form.addEventListener("submit", function(event) {
+        event.preventDefault(); // Impede o envio do formulário caso esteja em branco
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        // Faz a chamada à API de login
+        fetch("https://todolist-api.edsonmelo.com.br/api/user/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "username": username,
+            "password": password
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Usuário não encontrado");
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Verifica se o objeto data possui as propriedades esperadas
+          if (data.name && data.token && data.id && data.email) {
+            // Exibe os dados de login na página
+            const resultado = `Bem-vindo, ${data.name}! Seu token é ${data.token}, seu ID é ${data.id}, seu email é ${data.email}.`;
+            document.getElementById("resultado").innerHTML = resultado;
+          } else {
+            // Exibe uma mensagem de erro caso a resposta da API seja inválida
+            document.getElementById("resultado").innerHTML = "Não foi possível gerar o Token. Verifique as informações e tente novamente.";
+          }
+        })
+        .catch(error => {
+          // Exibe uma mensagem de erro caso a chamada à API falhe
+          document.getElementById("resultado").innerHTML = error.message;
+        });
+      });
+    </script>
+
+</body>
+</html>

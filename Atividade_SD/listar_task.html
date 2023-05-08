@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <style>
+	 a[href="task.html"] {
+		 color: red;
+	 }
+ 	</style>
+		<!-- BOOTSTRAPT COMEÇO-->
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Start your development with Dorang landing page.">
+    <meta name="author" content="Devcrud">
+    <title>API Task</title>
+    <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+		<link rel="stylesheet" href="assets/css/dorang.css">
+		<!-- BOOTSTRAPT FIM-->
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home" class="dark-theme">
+
+    <header class="header">
+        <div class="overlay"></div>
+        <div class="header-content">
+					<!-- COMEÇO TITULO E FORMULARIO DE REQUISIÇÃO -->
+          <h1 class="header-title">Lista de tasks</h1><br>
+          <form id="list_tasks">
+            <label for="token">Informe seu Token:</label>
+            <input type="text" id="token" name="token"><br><br>
+            <button type="submit">Ok</button><br><br>
+            <h2><a href="task.html">Retornar</h2>
+          </form>
+          <br>
+          <br>
+						<!-- RETORNA OS DADOS DO SCRIPT -->
+          <div id="resultado"></div>
+        </div>
+					<!-- FIM TITULO E FORMULARIO DE CRIAÇÃO -->
+    </header>
+
+		<script>
+		const form = document.getElementById("list_tasks");
+		form.addEventListener("submit", function(event) {
+		event.preventDefault(); // Impede o envio do formulário caso esteja em branco
+
+    const token = document.getElementById("token").value;
+      if (token.trim() === "") {
+        // Exibe uma mensagem de erro caso o campo token esteja em branco
+        document.getElementById("resultado").innerHTML = "Por favor, informe seu Token.";
+        return;
+      }
+
+		  // Faz a chamada à API de criação de task
+		  fetch("https://todolist-api.edsonmelo.com.br/api/task/search/", {
+		    method: "POST",
+		    headers: {
+		      "Content-Type": "application/json",
+					"Authorization": token
+		    },
+		  })
+		  .then(response => {
+        if (!response.ok) {
+            throw new Error("Token inválido. Por favor, verifique e tente novamente");
+          }
+          return response.json();
+        })
+				.then(data => {
+  			// Verifica se a API retornou tarefas
+  			if (data.length > 0) {
+   		 	// Cria uma tabela com as tarefas encontradas
+    		let table = '<table width="400" border="1">';
+    			// Cria a primeira linha da tabela com o cabeçalho
+    			table += '<tr><th>ID</th><th>UserID</th><th>Name</th><th>Date</th><th>Realized</th></tr>';
+    			// Preenche as outras linhas da tabela com os dados das tarefas
+          data.forEach(task => {
+  // Converte o valor de realized em uma string "Pendente" ou "Concluída"
+  const realizedText = task.realized ? "Concluída" : "Pendente";
+  // Adiciona os dados da tarefa na linha da tabela
+  table += `<tr><td>${task.id}</td><td>${task.userId}</td><td>${task.name}</td><td>${task.date}</td><td>${realizedText}</td></tr>`;
+});
+    			table += '</table>';
+    			// Exibe a tabela de tarefas na página
+    			document.getElementById('resultado').innerHTML = table;
+  			} else {
+    			// Exibe uma mensagem caso a API não encontre tarefas
+    			document.getElementById('resultado').innerHTML = 'Não foi possível encontrar nenhuma tarefa.';
+  			}
+})
+.catch(error => {
+  // Exibe uma mensagem de erro caso a chamada à API falhe
+  document.getElementById("resultado").innerHTML = error.message;
+});
+		});
+    </script>
+
+</body>
+</html>

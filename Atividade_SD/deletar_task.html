@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <style>
+	 a[href="task.html"] {
+		 color: red;
+	 }
+ 	</style>
+  <!-- BOOTSTRAPT COMEÇO-->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Start your development with Dorang landing page.">
+  <meta name="author" content="Devcrud">
+  <title>API Task</title>
+  <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="assets/css/dorang.css">
+  <!-- BOOTSTRAPT FIM-->
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="40" id="home" class="dark-theme">
+
+  <header class="header">
+    <div class="overlay"></div>
+    <div class="header-content">
+      <!-- COMEÇO TITULO E FORMULARIO DE UPDATE -->
+      <h1 class="header-title">Exclusão de Tasks</h1><br>
+      <form id="atualizar_form" onsubmit="enviarAtualizacao(); return false;">
+        <label for="id">ID Task:</label>
+        <input type="text" id="id" name="id"><br><br>
+        <label for="token">Token do usuário:</label>
+        <input type="text" id="token" name="token"><br><br>
+        <button type="submit">Apagar</button><br><br>
+        <h2><a href="task.html">Retornar</h2>
+      </form>
+      <br>
+      <br>
+      <!-- RETORNA OS DADOS DO SCRIPT -->
+      <div id="resultado"></div>
+    </div>
+    <!-- FIM TITULO E FORMULARIO DE ATUALIZAÇÃO -->
+  </header>
+
+  <script>
+    const form = document.getElementById("atualizar_form");
+    form.addEventListener("submit", function (event) {
+      event.preventDefault(); // Impede o envio do formulário caso esteja em branco
+
+      const id = document.getElementById("id").value;
+      const token = document.getElementById("token").value;
+
+      if (!id || !token) { // Verifica se algum dos campos está em branco
+  const resultado = "Por favor, preencha todos os campos";
+  document.getElementById("resultado").innerHTML = resultado;
+  return; // Encerra a função para não enviar a requisição
+}
+
+      // Faz a chamada à API de atualização de usuário
+      fetch("https://todolist-api.edsonmelo.com.br/api/task/delete/", {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": token
+        },
+        body: JSON.stringify({
+          "id": id,
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Não foi possível atualizar a tarefa");
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.message === "Task deleted Successfully") {
+            // Exibe a mensagem de sucesso na página
+            const resultado = "Task deletada com sucesso!";
+            document.getElementById("resultado").innerHTML = resultado;
+          } else if (data.message === "Task not exist") {
+            // Exibe uma mensagem de erro caso os argumentos estejam inválidos
+            const resultado = "Task não encontrada.";
+            document.getElementById("resultado").innerHTML = resultado;
+          }
+        })
+        .catch(error => {
+          // Exibe uma mensagem de erro caso a chamada à API falhe
+          document.getElementById("resultado").innerHTML = error.message;
+        });
+    });
+  </script>
+
+</body>
+
+</html>
